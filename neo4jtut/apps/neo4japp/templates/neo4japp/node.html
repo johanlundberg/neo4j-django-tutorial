@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}{{ block.super }} | Node {{ node.getId }}{% endblock %}
+
+{% block content %}
+    <h3>Node {{ node.getId }}</h3>
+        <h4>Node properties</h4>
+        <table>
+        {% for key,value in node.items %}
+            <tr>
+                <td><b>{{ key }}</b></td><td>{{ value }}</td>
+            </tr>
+        {% empty %}
+            <p>Sorry, no properties in this node.</p>
+        {% endfor %}
+        </table>
+
+        <h4>Relationships</h4>
+        <table>
+        {% for rel in node.getRelationships %}
+            <tr>
+                <td><a href="/node/{{ rel.start.getId }}/">{{ rel.start.getId }}</a></td><td><a href="/relationship/{{ rel.getId }}/">{{ rel.type }}</a></td><td><a href="/node/{{ rel.end.getId }}/">{{ rel.end.getId }}</a></td>
+            </tr>
+            <tr>
+                <td></td><td>{{rel.properties}}</td><td></td>
+            </tr>
+        {% endfor %}
+        </table>
+{% endblock %}

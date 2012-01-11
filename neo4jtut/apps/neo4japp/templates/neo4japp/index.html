@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block title %}{{ block.super }} | Index{% endblock %}
+
+{% block content %}
+    <div class="span16">
+        <h1>Welcome to a Neo4j and Django tutorial</h1>
+        <ul>
+            <li><a href="/node/0/">Start browsing the database</a></li>
+        </ul>
+    </div>
+{% endblock %}

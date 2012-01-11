@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}{{ block.super }} | Relationship {{ relationship.getId }}{% endblock %}
+
+{% block content %}
+    <h3>Relationship {{ relationship.getId }}</h3>
+    <p>
+        <h4><a href="/node/{{ relationship.start.getId }}/">Node {{ relationship.start.getId }}</a> {{ relationship.getType }} <a href="/node/{{ relationship.end.getId }}/">Node {{ relationship.end.getId }}</a></h4>
+    </p>
+
+    <h4>Relationship properties</h4>
+    <table>
+    {% for key,value in relationship.items %}
+        <tr>
+            <td><b>{{ key }}</b></td><td>{{ value }}</td>
+        </tr>
+    {% empty %}
+        <p>Sorry, no properties in this relationship.</p>
+    {% endfor %}
+    </table>
+{% endblock %}
