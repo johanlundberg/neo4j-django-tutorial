@@ -3,8 +3,8 @@
 # jbn@nordu.net - 2011
 #
 
-basedir=""
-djangoadmin=""
+basedir="."
+djangoadmin="env/bin/django-admin.py"
 projname="$1"
 
 cd $basedir

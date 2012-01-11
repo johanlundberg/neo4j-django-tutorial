@@ -3,7 +3,7 @@
 # jbn@nordu.net - 2011
 #
 
-basedir=""
+basedir="."
 projname="$1"
 appname="$2"
 

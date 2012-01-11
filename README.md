@@ -53,6 +53,15 @@ Download jpype (0.5.4.2).
     pip install lucene-querybuilder
 
 # Going forward
-
 Have a look in the neo4jtut projects generic_settings.py and
 neo4jclient.py file for some tips on how to I use Neo4j and Django.
+
+# Pro tips :)
+Some tips when I remember them.
+
+# IPython
+If you don't use it, start now. If you have it installed in your virtualenv the Django shell uses it.
+### Install IPython
+    pip install ipython
+    # In your project directory run
+    python manage.py shell
