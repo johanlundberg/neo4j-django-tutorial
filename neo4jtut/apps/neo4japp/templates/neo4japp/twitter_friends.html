@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}{{ block.super }} | Twitter friends{% endblock %}
+
+{% block content %}
+    <h3>Twitter Friends</h3>
+    <table class="zebra-striped">
+        <thead>
+            <tr>
+                <th>Twitter ID</th><th>Friends</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for item in user_list %}
+            <tr>
+                <td><a href="/node/{{ item.user.getId }}">{{ item.user.twid }}</a></td>
+                <td>{% for friend in item.friends %}<a href="/node/{{ friend.getId }}">{{ friend.twid }}<br />{% endfor %}</a></td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
