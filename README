@@ -1,0 +1,5 @@
+Neo4j and Django tutorial
+
+This is not _the_ way to do it, just _a_ way but the only way using the
+new neo4j-embedded Python bindings that I have seen.
+
