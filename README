@@ -19,7 +19,7 @@ sudo apt-get install virtualenv
 mkdir neo4j-django-tutorial
 cd neo4j-django-tutorial)
 
-Clone out my neo4j-django-tutorial git repository.
+Clone my neo4j-django-tutorial git repository.
 git clone ...
 cd neo4j-django-tutorial
 

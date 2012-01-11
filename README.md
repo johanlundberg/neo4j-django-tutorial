@@ -17,7 +17,7 @@ Download jpype (0.5.4.2).
 ### Install python-virtualenv.
     sudo apt-get install virtualenv
 
-### Clone out my neo4j-django-tutorial git repository.
+### Clone my neo4j-django-tutorial git repository.
     git clone git://github.com/johanlundberg/neo4j-django-tutorial.git
     cd neo4j-django-tutorial
 

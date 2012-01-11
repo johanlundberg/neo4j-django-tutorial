@@ -4,6 +4,7 @@
 
 {% block content %}
     <h3>Node {{ node.getId }}</h3>
+    <small>Has <a href="{{ handle.get_absolute_url }}">{{ handle }}</a> as Django database handle.</small>
         <h4>Node properties</h4>
         <table>
         {% for key,value in node.items %}
