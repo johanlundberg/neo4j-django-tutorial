@@ -47,6 +47,15 @@ mkdir neo4jdb
 Unzip twitter.s12gx.zip to the neo4jdb directory.
 unzip twitter.s12gx.zip -d neo4jdb
 
+Starting the tutorial app
+Copy neo4jtut/generic_settings.py to neo4jtut/settings.py and change the path on line 14 (NEO4JTUT_ROOT) to the path matching your system.
+
+Sync the SQL database and start the development server.
+python neo4jtut/manage.py syncdb
+python neo4jtut/manage.py runserver
+
+Open http://localhost:8000 in your favorite browser.
+
 Start a new Django project and create a new app.
 mkproj.sh project_name
 mkapp.sh project_name app_name
