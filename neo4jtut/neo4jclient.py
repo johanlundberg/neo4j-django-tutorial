@@ -10,14 +10,14 @@ from neo4j import GraphDatabase
 from django.conf import settings as django_settings
 NEO4J_URI = django_settings.NEO4J_RESOURCE_URI
 
-def open_db(uri=NEO4J_URI, allow_store_upgrade="true"):
+def open_db(uri=NEO4J_URI):
     '''
     Open or create a Neo4j database in the supplied path. As the module
     opens the database located at NEO4J_URI when imported you shouldn't have
     to use this.
     '''
     if uri:
-        return GraphDatabase(uri)
+        return GraphDatabase(uri, allow_store_upgrade='true')
     raise Exception('No NEO4J_URI set.')
         
 # Open the database that is set in the Django settings NEO4J_RESOURCE_URI as 

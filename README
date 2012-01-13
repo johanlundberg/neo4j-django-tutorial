@@ -48,7 +48,8 @@ Unzip twitter.s12gx.zip to the neo4jdb directory.
 unzip twitter.s12gx.zip -d neo4jdb
 
 Starting the tutorial app
-Copy neo4jtut/generic_settings.py to neo4jtut/settings.py and change the path on line 14 (NEO4JTUT_ROOT) to the path matching your system.
+Copy neo4jtut/generic_settings.py to neo4jtut/settings.py and change the path on line 14 to the path matching your system.
+NEO4JTUT_ROOT = '/path/to/neo4j-django-tutorial'
 
 Sync the SQL database and start the development server.
 python neo4jtut/manage.py syncdb
@@ -56,13 +57,10 @@ python neo4jtut/manage.py runserver
 
 Open http://localhost:8000 in your favorite browser.
 
+Going forward
 Start a new Django project and create a new app.
 mkproj.sh project_name
 mkapp.sh project_name app_name
-
-To make it easier to use the Lucene indexes you should install
-lucene-querybuilder (0.1.5).
-pip install lucene-querybuilder
 
 Have a look in the neo4jtut projects generic_settings.py and
 neo4jclient.py file for some tips on how to I use Neo4j and Django.
@@ -77,3 +75,8 @@ Install IPython
 pip install ipython
 In your project directory run
 python manage.py shell
+
+lucene-querybuilder
+To make it easier to use the Lucene indexes you should install
+lucene-querybuilder (0.1.5).
+pip install lucene-querybuilder

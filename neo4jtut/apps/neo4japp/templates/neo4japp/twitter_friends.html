@@ -14,7 +14,7 @@
         {% for item in user_list %}
             <tr>
                 <td><a href="/node/{{ item.user.getId }}">{{ item.user.twid }}</a></td>
-                <td>{% for friend in item.friends %}<a href="/node/{{ friend.getId }}">{{ friend.twid }}<br />{% endfor %}</a></td>
+                <td>{% for friend in item.collectfriends %}<a href="/node/{{ friend.getId }}">{{ friend.twid }}<br />{% endfor %}</a></td>
             </tr>
         {% endfor %}
         </tbody>

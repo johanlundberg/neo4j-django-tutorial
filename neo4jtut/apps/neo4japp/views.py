@@ -32,13 +32,15 @@ def twitterfriends(request):
     cypher_query = '''
         START users = node(2) 
         MATCH users-[:USER]->(user)-[:KNOWS]->(friend) 
-        RETURN user, collect(friend)
+        RETURN user, collect(friend) as collectfriends
         '''
     query = nc.neo4jdb.query(cypher_query)
-    user_list = []
-    for hit in query:
-        user_list.append({'user': hit['user'], 
-                          'friends': hit['collect(friend)']})
+    # If you run neo4j-embedded < 1.6 milestone you have to remove 
+    # "as collectfriends" from the above query and uncomment line 40-43.
+    #user_list = []
+    #for hit in query:
+    #    user_list.append({'user': hit['user'], 
+    #                      'collectfriends': hit['collect(friend)']})
     return render_to_response('neo4japp/twitter_friends.html', 
-                              {'user_list': user_list},
+                              {'user_list': query},
                               context_instance=RequestContext(request))

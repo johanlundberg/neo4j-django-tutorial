@@ -12,7 +12,7 @@ ADMINS = (
 MANAGERS = ADMINS
 
 NEO4JTUT_ROOT = '/path/to/neo4j-django-tutorial'
-NEO4J_RESOURCE_URI = join(NEO4JTUT_ROOT, '/neo4jdb')
+NEO4J_RESOURCE_URI = join(NEO4JTUT_ROOT, 'neo4jdb')
 
 DATABASES = {
     'default': {
