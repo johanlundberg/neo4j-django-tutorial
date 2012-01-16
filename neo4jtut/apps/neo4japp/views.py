@@ -35,7 +35,7 @@ def twitterfriends(request):
         RETURN user, collect(friend) as collectfriends
         '''
     query = nc.neo4jdb.query(cypher_query)
-    # If you run neo4j-embedded < 1.6 milestone you have to remove 
+    # If you run neo4j-embedded < 1.6.b3  you have to remove 
     # "as collectfriends" from the above query and uncomment line 40-43.
     #user_list = []
     #for hit in query:
