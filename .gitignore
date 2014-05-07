@@ -35,4 +35,3 @@ settings.py
 # Other #
 ######################
 env/*
-neo4jdb/*
