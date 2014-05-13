@@ -2,7 +2,7 @@ __author__ = 'lundberg'
 
 import neo4j
 from contextlib import contextmanager
-
+from re import escape
 
 class Neo4jDBConnectionManager():
 
@@ -74,3 +74,29 @@ class Neo4jDBConnectionManager():
             connection.commit()
             connection.close()
 
+
+manager = Neo4jDBConnectionManager("http://localhost:7474")
+
+
+def get_node(handle_id):
+    with manager.read() as r:
+        q = 'START n=node:node_auto_index(handle_id={handle_id}) RETURN n LIMIT 1'
+        for n in r.execute(q, handle_id=handle_id).fetchone():
+            return n
+
+
+def get_unique_node(label, key, value):
+    with manager.read() as r:
+        q = 'MATCH (n:%s {%s: {value}}) RETURN id(n) as id, n LIMIT 1' % (label, key)
+        return r.execute(q, value=value).fetchone()
+
+
+def wildcard_search(query):
+    query = '(?i).*%s.*' % escape(query)
+    q = """
+        MATCH (m:Movie) WHERE m.title =~ {query} WITH collect(m) as movies
+        MATCH (p:Person) WHERE p.name =~ {query} WITH movies, collect(p) as persons
+        RETURN movies, persons
+        """
+    with manager.read() as r:
+        return r.execute(q, query=query).fetchone()
