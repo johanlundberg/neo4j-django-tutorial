@@ -3,12 +3,13 @@ __author__ = 'lundberg'
 
 
 from django.core.management.base import BaseCommand
+import uuid
 from apps.neo4japp.models import Movie, Person
 from neo4jtut import db
 
 
 class Command(BaseCommand):
-    help = 'Create NodeHandle and set handle_id for nodes missing handle_id property'
+    help = 'Create a NodeHandle and set handle_id for nodes missing handle_id property'
 
     def handle(self, *args, **options):
         q = """
@@ -19,17 +20,24 @@ class Command(BaseCommand):
         with db.manager.read() as r:
             movies, persons = r.execute(q).fetchone()
 
+        q = 'START n=node({node_id}) SET n.handle_id = {handle_id}'
         m, p = 0, 0
-        for node_id in movies:
-            movie = Movie.objects.create()
-            with db.manager.write() as w:
-                w.execute('START n=node({node_id}) SET n.handle_id = {handle_id}', node_id=node_id, handle_id=movie.pk)
-            m += 1
+        movie_objs = []
+        person_objs = []
+        with db.manager.transaction() as w:
+            for node_id in movies:
+                movie = Movie(handle_id=str(uuid.uuid4()))
+                movie_objs.append(movie)
+                w.execute(q, node_id=node_id, handle_id=movie.handle_id)
+                m += 1
+        Movie.objects.bulk_create(movie_objs)
 
-        for node_id in persons:
-            movie = Person.objects.create()
-            with db.manager.write() as w:
-                w.execute('START n=node({node_id}) SET n.handle_id = {handle_id}', node_id=node_id, handle_id=movie.pk)
-            p += 1
+        with db.manager.transaction() as w:
+            for node_id in persons:
+                person = Person(handle_id=str(uuid.uuid4()))
+                person_objs.append(person)
+                w.execute(q, node_id=node_id, handle_id=person.handle_id)
+                p += 1
+        Person.objects.bulk_create(person_objs)
 
         self.stdout.write('Successfully completed! Added %d movies and %d persons.' % (m, p))

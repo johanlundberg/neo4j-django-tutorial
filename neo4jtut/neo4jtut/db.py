@@ -58,20 +58,25 @@ class Neo4jDBConnectionManager():
     def write(self):
         try:
             yield self.connection.cursor()
-        except neo4j.Connection.Error:
+        except neo4j.Connection.Error as e:
             self.connection.rollback()
-        finally:
+            raise e
+        else:
             self.connection.commit()
+        finally:
+            pass
 
     @contextmanager
     def transaction(self):
         connection = neo4j.connect(self.dsn)
         try:
             yield connection.cursor()
-        except neo4j.Connection.Error:
+        except neo4j.Connection.Error as e:
             connection.rollback()
-        finally:
+            raise e
+        else:
             connection.commit()
+        finally:
             connection.close()
 
 
@@ -79,24 +84,37 @@ manager = Neo4jDBConnectionManager("http://localhost:7474")
 
 
 def get_node(handle_id):
-    with manager.read() as r:
-        q = 'START n=node:node_auto_index(handle_id={handle_id}) RETURN n LIMIT 1'
-        for n in r.execute(q, handle_id=handle_id).fetchone():
-            return n
+    q = 'START n=node:node_auto_index(handle_id={handle_id}) RETURN n LIMIT 1'
+    try:
+        with manager.read() as r:
+            for n in r.execute(q, handle_id=handle_id).fetchone():
+                return n
+    except IndexError:
+        return {}
+
+
+def delete_node(handle_id):
+    q = '''
+        START n=node:node_auto_index(handle_id={handle_id})
+        OPTIONAL MATCH (n)-[r]-()
+        DELETE n, r
+        '''
+    with manager.transaction() as w:
+        w.execute(q, handle_id=handle_id)
 
 
 def get_unique_node(label, key, value):
+    q = 'MATCH (n:%s {%s: {value}}) RETURN n LIMIT 1' % (label, key)
     with manager.read() as r:
-        q = 'MATCH (n:%s {%s: {value}}) RETURN id(n) as id, n LIMIT 1' % (label, key)
         return r.execute(q, value=value).fetchone()
 
 
-def wildcard_search(query):
-    query = '(?i).*%s.*' % escape(query)
+def wildcard_search(search_string):
+    search_string = '(?i).*%s.*' % escape(search_string)
     q = """
-        MATCH (m:Movie) WHERE m.title =~ {query} WITH collect(m) as movies
-        MATCH (p:Person) WHERE p.name =~ {query} WITH movies, collect(p) as persons
+        MATCH (m:Movie) WHERE m.title =~ {search_string} WITH collect(m) as movies
+        MATCH (p:Person) WHERE p.name =~ {search_string} WITH movies, collect(p) as persons
         RETURN movies, persons
         """
     with manager.read() as r:
-        return r.execute(q, query=query).fetchone()
+        return r.execute(q, search_string=search_string).fetchone()
