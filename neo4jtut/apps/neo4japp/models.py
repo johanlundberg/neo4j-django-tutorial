@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.urlresolvers import reverse
 from neo4jtut import db
 
 
@@ -31,20 +32,24 @@ class NodeHandle(models.Model):
 class Movie(NodeHandle):
 
     def __unicode__(self):
-        return '%s' % self.node().get('title', 'Missing title')
+        return self.title
 
-    @models.permalink
+    def _title(self):
+        return self.node().get('title', 'Missing title')
+    title = property(_title)
+
     def get_absolute_url(self):
-        return('neo4jtut.apps.neo4japp.views.movie_detail', (),
-               {'handle_id': self.pk})
+        return reverse('movie-detail', args=[str(self.id)])
 
 
 class Person(NodeHandle):
 
     def __unicode__(self):
-        return '%s' % self.node().get('name', 'Missing name')
+        return self.name
 
-    @models.permalink
+    def _name(self):
+        return self.node().get('name', 'Missing name')
+    name = property(_name)
+
     def get_absolute_url(self):
-        return('neo4jtut.apps.neo4japp.views.person_detail', (),
-               {'handle_id': self.pk})
+        return reverse('person-detail', args=[str(self.id)])

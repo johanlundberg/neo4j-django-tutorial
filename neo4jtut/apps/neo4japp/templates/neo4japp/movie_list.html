@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block title %}{{ block.super }} | Movies{% endblock %}
+
+{% block content %}
+    <div class="list-group">
+        {% for movie in object_list|dictsort:"title" %}
+            <a href="{{ movie.get_absolute_url }}" class="list-group-item">
+                <h4 class="list-group-item-heading">{{ movie }}</h4>
+                <p class="list-group-item-text">More to come</p>
+            </a>
+        {% empty %}
+            <a href="/">
+                <h4 class="list-group-item-heading">No movies yet</h4>
+            </a>
+        {% endfor %}
+    </div>
+{% endblock %}

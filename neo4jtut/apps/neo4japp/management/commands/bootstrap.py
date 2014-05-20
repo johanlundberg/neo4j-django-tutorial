@@ -3,6 +3,7 @@ __author__ = 'lundberg'
 
 
 from django.core.management.base import BaseCommand
+from django.db import DatabaseError
 import uuid
 from apps.neo4japp.models import Movie, Person
 from neo4jtut import db
@@ -17,27 +18,43 @@ class Command(BaseCommand):
             MATCH (p:Person) WHERE p.handle_id IS NULL WITH movies, collect(id(p)) as persons
             RETURN movies, persons
             """
-        with db.manager.read() as r:
+        with db.manager.read as r:
             movies, persons = r.execute(q).fetchone()
 
         q = 'START n=node({node_id}) SET n.handle_id = {handle_id}'
         m, p = 0, 0
         movie_objs = []
         person_objs = []
-        with db.manager.transaction() as w:
-            for node_id in movies:
-                movie = Movie(handle_id=str(uuid.uuid4()))
-                movie_objs.append(movie)
-                w.execute(q, node_id=node_id, handle_id=movie.handle_id)
-                m += 1
-        Movie.objects.bulk_create(movie_objs)
+        with db.manager.transaction as w:
+            try:
+                for node_id in movies:
+                    movie = Movie(handle_id=str(uuid.uuid4()))
+                    movie_objs.append(movie)
+                    w.execute(q, node_id=node_id, handle_id=movie.handle_id)
+                    m += 1
+            except Exception as e:
+                raise e
+            else:
+                try:
+                    Movie.objects.bulk_create(movie_objs)
+                except DatabaseError as e:
+                    w.connection.rollback()
+                    raise e
 
-        with db.manager.transaction() as w:
-            for node_id in persons:
-                person = Person(handle_id=str(uuid.uuid4()))
-                person_objs.append(person)
-                w.execute(q, node_id=node_id, handle_id=person.handle_id)
-                p += 1
-        Person.objects.bulk_create(person_objs)
+        with db.manager.transaction as w:
+            try:
+                for node_id in persons:
+                    person = Person(handle_id=str(uuid.uuid4()))
+                    person_objs.append(person)
+                    w.execute(q, node_id=node_id, handle_id=person.handle_id)
+                    p += 1
+            except Exception as e:
+                raise e
+            else:
+                try:
+                    Person.objects.bulk_create(person_objs)
+                except DatabaseError as e:
+                    w.connection.rollback()
+                    raise e
 
         self.stdout.write('Successfully completed! Added %d movies and %d persons.' % (m, p))
