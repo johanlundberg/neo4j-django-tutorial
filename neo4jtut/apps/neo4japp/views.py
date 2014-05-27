@@ -17,6 +17,14 @@ class MovieListView(ListView):
     model = Movie
 
 
+class PersonDetailView(DetailView):
+    model = Person
+
+
+class PersonListView(ListView):
+    model = Person
+
+
 def index(request):
     return render_to_response('neo4japp/index.html', {},
                               context_instance=RequestContext(request))

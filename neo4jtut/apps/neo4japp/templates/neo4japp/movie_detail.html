@@ -2,5 +2,54 @@
 {% block title %}{{ block.super }} | Movies | {{ object }}{% endblock %}
 
 {% block content %}
-{{ object }}
+    <div class="page-header">
+        <h1>{{ object.title }} <small>{{ object.node.tagline }}</small></h1>
+    </div>
+    <p>Released: {{ object.node.released }}</p>
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Actors</h3>
+                </div>
+                <div class="panel-body">
+                    <ul class="list-unstyled">
+                        {% for actor in object.actors|dictsort:"person.name" %}
+                        <li>
+                            <a href="{{ actor.person.get_absolute_url }}">{{ actor.person.name }}</a> as
+                            <ul>
+                                {% for role in actor.roles %}
+                                    <li>{{ role }}</li>
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Panel title</h3>
+                </div>
+                <div class="panel-body">
+                    Panel content
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Panel title</h3>
+                </div>
+                <div class="panel-body">
+                    Panel content
+                </div>
+            </div>
+        </div>
+    </div>
+
+
 {% endblock %}

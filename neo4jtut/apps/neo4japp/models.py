@@ -41,6 +41,13 @@ class Movie(NodeHandle):
     def get_absolute_url(self):
         return reverse('movie-detail', args=[str(self.id)])
 
+    def _actors(self):
+        actors = []
+        for actor_id, roles in db.get_actors(self.handle_id):
+            actors.append({'person': Person.objects.get(handle_id=actor_id), 'roles': roles})
+        return actors
+    actors = property(_actors)
+
 
 class Person(NodeHandle):
 

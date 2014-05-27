@@ -41,3 +41,12 @@ def wildcard_search(search_string):
         """
     with manager.read as r:
         return r.execute(q, search_string=search_string).fetchone()
+
+
+def get_actors(handle_id):
+    q = """
+        MATCH (n:Movie {handle_id: {handle_id}})<-[r:ACTED_IN]-(actor)
+        RETURN actor.handle_id, r.roles
+        """
+    with manager.read as r:
+        return r.execute(q, handle_id=handle_id).fetchall()
