@@ -5,8 +5,21 @@
     <div class="page-header">
         <h1>{{ object.title }} <small>{{ object.node.tagline }}</small></h1>
     </div>
-    <p>Released: {{ object.node.released }}</p>
-
+    <div class="row">
+        <div class="col-md-6">
+            <dl class="dl-horizontal">
+                <dt>Released:</dt><dd>{{ object.node.released }}</dd>
+                {% if object.writers %}
+                    <dt>Written by:</dt>
+                    <dd>
+                        {% for writer in object.writers|dictsort:"person.name" %}
+                            <a href="{{ writer.person.get_absolute_url }}">{{ writer.person.name }}</a>{% if not forloop.last %}, {% else %}{% endif %}
+                        {% endfor %}
+                    </dd>
+                {% endif %}
+            </dl>
+        </div>
+    </div>
     <div class="row">
         <div class="col-md-4">
             <div class="panel panel-default">
@@ -16,14 +29,16 @@
                 <div class="panel-body">
                     <ul class="list-unstyled">
                         {% for actor in object.actors|dictsort:"person.name" %}
-                        <li>
-                            <a href="{{ actor.person.get_absolute_url }}">{{ actor.person.name }}</a> as
-                            <ul>
-                                {% for role in actor.roles %}
-                                    <li>{{ role }}</li>
-                                {% endfor %}
-                            </ul>
-                        </li>
+                            <li>
+                                <a href="{{ actor.person.get_absolute_url }}">{{ actor.person.name }}</a> as
+                                <ul>
+                                    {% for role in actor.roles %}
+                                        <li>{{ role }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </li>
+                        {% empty %}
+                            <li>No actors yet.</li>
                         {% endfor %}
                     </ul>
                 </div>
@@ -32,24 +47,38 @@
         <div class="col-md-4">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    <h3 class="panel-title">Panel title</h3>
+                    <h3 class="panel-title">Directors</h3>
                 </div>
                 <div class="panel-body">
-                    Panel content
+                    <ul class="list-unstyled">
+                        {% for director in object.directors|dictsort:"person.name" %}
+                            <li>
+                                <a href="{{ director.person.get_absolute_url }}">{{ director.person.name }}</a>
+                            </li>
+                        {% empty %}
+                            <li>No directors yet.</li>
+                        {% endfor %}
+                    </ul>
                 </div>
             </div>
         </div>
         <div class="col-md-4">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    <h3 class="panel-title">Panel title</h3>
+                    <h3 class="panel-title">Producers</h3>
                 </div>
                 <div class="panel-body">
-                    Panel content
+                    <ul class="list-unstyled">
+                        {% for producer in object.producers|dictsort:"person.name" %}
+                        <li>
+                            <a href="{{ producer.person.get_absolute_url }}">{{ producer.person.name }}</a>
+                        </li>
+                        {% empty %}
+                            <li>No producers yet.</li>
+                        {% endfor %}
+                    </ul>
                 </div>
             </div>
         </div>
     </div>
-
-
 {% endblock %}
