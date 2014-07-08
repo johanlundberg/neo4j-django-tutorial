@@ -13,6 +13,9 @@ class Command(BaseCommand):
     help = 'Create a NodeHandle and set handle_id for nodes missing handle_id property'
 
     def handle(self, *args, **options):
+        with db.manager.transaction as w:
+            w.execute('CREATE INDEX ON :Person(handle_id)')
+            w.execute('CREATE INDEX ON :Movie(handle_id)')
         q = """
             MATCH (m:Movie) WHERE m.handle_id IS NULL WITH collect(id(m)) as movies
             MATCH (p:Person) WHERE p.handle_id IS NULL WITH movies, collect(id(p)) as persons

@@ -6,8 +6,8 @@ from re import escape
 manager = contextmanager.Neo4jDBConnectionManager("http://localhost:7474")
 
 
-def get_node(handle_id):
-    q = 'START n=node:node_auto_index(handle_id={handle_id}) RETURN n LIMIT 1'
+def get_node(handle_id, label):
+    q = 'MATCH (n:%s { handle_id: {handle_id} }) RETURN n' % label  # Ugly hack
     try:
         with manager.read as r:
             for n in r.execute(q, handle_id=handle_id).fetchone():
@@ -16,12 +16,12 @@ def get_node(handle_id):
         return {}
 
 
-def delete_node(handle_id):
+def delete_node(handle_id, label):
     q = '''
-        START n=node:node_auto_index(handle_id={handle_id})
+        MATCH (n:%s { handle_id: {handle_id} })
         OPTIONAL MATCH (n)-[r]-()
         DELETE n, r
-        '''
+        ''' % label
     with manager.transaction as w:
         w.execute(q, handle_id=handle_id)
 
@@ -45,8 +45,36 @@ def wildcard_search(search_string):
 
 def get_actors(handle_id):
     q = """
-        MATCH (n:Movie {handle_id: {handle_id}})<-[r:ACTED_IN]-(actor)
-        RETURN actor.handle_id, r.roles
+        MATCH (n:Movie {handle_id: {handle_id}})<-[r:ACTED_IN]-(person)
+        RETURN person.handle_id, r.roles
         """
     with manager.read as r:
         return r.execute(q, handle_id=handle_id).fetchall()
+
+
+def get_directors(handle_id):
+    q = """
+        MATCH (n:Movie {handle_id: {handle_id}})<-[r:DIRECTED]-(person)
+        RETURN person.handle_id
+        """
+    with manager.read as r:
+        return r.execute(q, handle_id=handle_id).fetchall()
+
+
+def get_producers(handle_id):
+    q = """
+        MATCH (n:Movie {handle_id: {handle_id}})<-[r:PRODUCED]-(person)
+        RETURN person.handle_id
+        """
+    with manager.read as r:
+        return r.execute(q, handle_id=handle_id).fetchall()
+
+
+def get_writers(handle_id):
+    q = """
+        MATCH (n:Movie {handle_id: {handle_id}})<-[r:WROTE]-(person)
+        RETURN person.handle_id
+        """
+    with manager.read as r:
+        return r.execute(q, handle_id=handle_id).fetchall()
+
