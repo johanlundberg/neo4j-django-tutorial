@@ -18,7 +18,7 @@ virtualenv neo4j-django-tutorial
 . neo4j-django-tutorial/bin/activate
 ```
 
-Install the packages that you need:
+Install the packages that you need (paver is needed until neo4jdb issue #5 is closed):
 
 ```
 pip install paver==1.2.2
