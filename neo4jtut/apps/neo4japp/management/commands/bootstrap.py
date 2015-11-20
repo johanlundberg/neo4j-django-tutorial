@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-__author__ = 'lundberg'
-
 
 from django.core.management.base import BaseCommand
 from django.db import DatabaseError
@@ -8,6 +6,7 @@ import uuid
 from apps.neo4japp.models import Movie, Person
 from neo4jtut import db
 
+__author__ = 'lundberg'
 
 class Command(BaseCommand):
     help = 'Create a NodeHandle and set handle_id for nodes missing handle_id property'
@@ -21,8 +20,11 @@ class Command(BaseCommand):
             MATCH (p:Person) WHERE p.handle_id IS NULL WITH movies, collect(id(p)) as persons
             RETURN movies, persons
             """
-        with db.manager.read as r:
-            movies, persons = r.execute(q).fetchone()
+        try:
+            with db.manager.read as r:
+                movies, persons = r.execute(q).fetchone()
+        except IndexError:
+            movies, persons = [], []
 
         q = 'START n=node({node_id}) SET n.handle_id = {handle_id}'
         m, p = 0, 0

@@ -1,2 +1,2 @@
-Django==1.6.5
-neo4jdb==0.0.6
+Django<1.9
+neo4jdb==0.0.8

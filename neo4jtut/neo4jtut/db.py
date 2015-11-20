@@ -1,9 +1,10 @@
-__author__ = 'lundberg'
-
 from neo4j import contextmanager
 from re import escape
+from django.conf import settings
+__author__ = 'lundberg'
 
-manager = contextmanager.Neo4jDBConnectionManager("http://localhost:7474")
+manager = contextmanager.Neo4jDBConnectionManager(settings.NEO4J_RESOURCE_URI, settings.NEO4J_USERNAME,
+                                                  settings.NEO4J_PASSWORD)
 
 
 def get_node(handle_id, label):
