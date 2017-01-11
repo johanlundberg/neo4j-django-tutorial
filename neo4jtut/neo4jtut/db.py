@@ -1,20 +1,18 @@
-from neo4j import contextmanager
 from re import escape
 from django.conf import settings
+from neo4jtut.contextmanager import Neo4jDBSessionManager
+
 __author__ = 'lundberg'
 
-manager = contextmanager.Neo4jDBConnectionManager(settings.NEO4J_RESOURCE_URI, settings.NEO4J_USERNAME,
-                                                  settings.NEO4J_PASSWORD)
+manager = Neo4jDBSessionManager(settings.NEO4J_RESOURCE_URI, settings.NEO4J_USERNAME, settings.NEO4J_PASSWORD)
 
 
 def get_node(handle_id, label):
     q = 'MATCH (n:%s { handle_id: {handle_id} }) RETURN n' % label  # Ugly hack
-    try:
-        with manager.read as r:
-            for n in r.execute(q, handle_id=handle_id).fetchone():
-                return n
-    except IndexError:
-        return {}
+    with manager.session as s:
+        result = s.run(q, {'handle_id': handle_id})
+        for record in result:
+            return record['n']
 
 
 def delete_node(handle_id, label):
@@ -23,25 +21,28 @@ def delete_node(handle_id, label):
         OPTIONAL MATCH (n)-[r]-()
         DELETE n, r
         ''' % label
-    with manager.transaction as w:
-        w.execute(q, handle_id=handle_id)
+    with manager.session as s:
+        s.run(q, {'handle_id': handle_id})
 
 
 def get_unique_node(label, key, value):
     q = 'MATCH (n:%s {%s: {value}}) RETURN n LIMIT 1' % (label, key)
-    with manager.read as r:
-        return r.execute(q, value=value).fetchone()
+    with manager.session as s:
+        result = s.run(q, {'value': value})
+        for record in result:
+            return record['n']
 
 
 def wildcard_search(search_string):
     search_string = '(?i).*%s.*' % escape(search_string)
     q = """
-        MATCH (m:Movie) WHERE m.title =~ {search_string} WITH collect(m) as movies
-        MATCH (p:Person) WHERE p.name =~ {search_string} WITH movies, collect(p) as persons
+        OPTIONAL MATCH (m:Movie) WHERE m.title =~ {search_string} WITH collect(m) as movies
+        OPTIONAL MATCH (p:Person) WHERE p.name =~ {search_string} WITH movies, collect(p) as persons
         RETURN movies, persons
         """
-    with manager.read as r:
-        return r.execute(q, search_string=search_string).fetchone()
+    with manager.session as s:
+        result = s.run(q, {'search_string': search_string})
+        return list(result)
 
 
 def get_actors(handle_id):
@@ -49,8 +50,10 @@ def get_actors(handle_id):
         MATCH (n:Movie {handle_id: {handle_id}})<-[r:ACTED_IN]-(person)
         RETURN person.handle_id, r.roles
         """
-    with manager.read as r:
-        return r.execute(q, handle_id=handle_id).fetchall()
+    with manager.session as s:
+        result = s.run(q, {'handle_id': handle_id})
+        for record in result:
+            yield {'handle_id': record['person.handle_id'], 'roles': record['r.roles']}
 
 
 def get_directors(handle_id):
@@ -58,8 +61,10 @@ def get_directors(handle_id):
         MATCH (n:Movie {handle_id: {handle_id}})<-[r:DIRECTED]-(person)
         RETURN person.handle_id
         """
-    with manager.read as r:
-        return r.execute(q, handle_id=handle_id).fetchall()
+    with manager.session as s:
+        result = s.run(q, {'handle_id': handle_id})
+        for record in result:
+            yield {'handle_id': record['person.handle_id']}
 
 
 def get_producers(handle_id):
@@ -67,8 +72,10 @@ def get_producers(handle_id):
         MATCH (n:Movie {handle_id: {handle_id}})<-[r:PRODUCED]-(person)
         RETURN person.handle_id
         """
-    with manager.read as r:
-        return r.execute(q, handle_id=handle_id).fetchall()
+    with manager.session as s:
+        result = s.run(q, {'handle_id': handle_id})
+        for record in result:
+            yield {'handle_id': record['person.handle_id']}
 
 
 def get_writers(handle_id):
@@ -76,6 +83,8 @@ def get_writers(handle_id):
         MATCH (n:Movie {handle_id: {handle_id}})<-[r:WROTE]-(person)
         RETURN person.handle_id
         """
-    with manager.read as r:
-        return r.execute(q, handle_id=handle_id).fetchall()
+    with manager.session as s:
+        result = s.run(q, {'handle_id': handle_id})
+        for record in result:
+            yield {'handle_id': record['person.handle_id']}
 

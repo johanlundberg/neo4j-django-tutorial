@@ -18,10 +18,12 @@ class MovieListView(ListView):
 
 
 class PersonDetailView(DetailView):
+
     model = Person
 
 
 class PersonListView(ListView):
+
     model = Person
 
 

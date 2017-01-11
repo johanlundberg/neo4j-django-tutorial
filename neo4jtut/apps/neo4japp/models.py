@@ -35,7 +35,10 @@ class Movie(NodeHandle):
         return self.title
 
     def _title(self):
-        return self.node().get('title', 'Missing title')
+        try:
+            return self.node().properties.get('title', 'Missing title')
+        except AttributeError:
+            return 'Missing node?'
     title = property(_title)
 
     def get_absolute_url(self):
@@ -43,29 +46,29 @@ class Movie(NodeHandle):
 
     def _actors(self):
         persons = []
-        for person_id, roles in db.get_actors(self.handle_id):
-            persons.append({'person': Person.objects.get(handle_id=person_id), 'roles': roles})
+        for person in db.get_actors(self.handle_id):
+            persons.append({'person': Person.objects.get(handle_id=person['handle_id']), 'roles': person['roles']})
         return persons
     actors = property(_actors)
 
     def _directors(self):
         persons = []
-        for person_id, in db.get_directors(self.handle_id):
-            persons.append({'person': Person.objects.get(handle_id=person_id)})
+        for person in db.get_directors(self.handle_id):
+            persons.append({'person': Person.objects.get(handle_id=person['handle_id'])})
         return persons
     directors = property(_directors)
 
     def _producers(self):
         persons = []
-        for person_id, in db.get_producers(self.handle_id):
-            persons.append({'person': Person.objects.get(handle_id=person_id)})
+        for person in db.get_producers(self.handle_id):
+            persons.append({'person': Person.objects.get(handle_id=person['handle_id'])})
         return persons
     producers = property(_producers)
 
     def _writers(self):
         persons = []
-        for person_id, in db.get_writers(self.handle_id):
-            persons.append({'person': Person.objects.get(handle_id=person_id)})
+        for person in db.get_writers(self.handle_id):
+            persons.append({'person': Person.objects.get(handle_id=person['handle_id'])})
         return persons
     writers = property(_writers)
 
@@ -76,7 +79,10 @@ class Person(NodeHandle):
         return self.name
 
     def _name(self):
-        return self.node().get('name', 'Missing name')
+        try:
+            return self.node().properties.get('name', 'Missing name')
+        except AttributeError:
+            return 'Missing node?'
     name = property(_name)
 
     def get_absolute_url(self):

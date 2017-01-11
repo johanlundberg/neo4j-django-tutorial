@@ -8,21 +8,24 @@ from neo4jtut import db
 
 __author__ = 'lundberg'
 
+
 class Command(BaseCommand):
     help = 'Create a NodeHandle and set handle_id for nodes missing handle_id property'
 
     def handle(self, *args, **options):
-        with db.manager.transaction as w:
-            w.execute('CREATE INDEX ON :Person(handle_id)')
-            w.execute('CREATE INDEX ON :Movie(handle_id)')
+        with db.manager.session as s:
+            s.run('CREATE CONSTRAINT ON (p:Person) ASSERT p.handle_id IS UNIQUE')
+            s.run('CREATE CONSTRAINT ON (m:Movie) ASSERT m.handle_id IS UNIQUE')
         q = """
-            MATCH (m:Movie) WHERE m.handle_id IS NULL WITH collect(id(m)) as movies
-            MATCH (p:Person) WHERE p.handle_id IS NULL WITH movies, collect(id(p)) as persons
+            OPTIONAL MATCH (m:Movie) WHERE NOT exists(m.handle_id) WITH collect(id(m)) as movies
+            OPTIONAL MATCH (p:Person) WHERE NOT exists(p.handle_id) WITH movies, collect(id(p)) as persons
             RETURN movies, persons
             """
         try:
-            with db.manager.read as r:
-                movies, persons = r.execute(q).fetchone()
+            with db.manager.session as s:
+                record = s.run(q).single()
+                movies = record['movies']
+                persons = record['persons']
         except IndexError:
             movies, persons = [], []
 
@@ -30,12 +33,12 @@ class Command(BaseCommand):
         m, p = 0, 0
         movie_objs = []
         person_objs = []
-        with db.manager.transaction as w:
+        with db.manager.transaction as t:
             try:
                 for node_id in movies:
                     movie = Movie(handle_id=str(uuid.uuid4()))
                     movie_objs.append(movie)
-                    w.execute(q, node_id=node_id, handle_id=movie.handle_id)
+                    t.run(q, {'node_id': node_id, 'handle_id': movie.handle_id})
                     m += 1
             except Exception as e:
                 raise e
@@ -43,15 +46,16 @@ class Command(BaseCommand):
                 try:
                     Movie.objects.bulk_create(movie_objs)
                 except DatabaseError as e:
-                    w.connection.rollback()
+                    t.success = False
                     raise e
+            t.success = True
 
-        with db.manager.transaction as w:
+        with db.manager.transaction as t:
             try:
                 for node_id in persons:
                     person = Person(handle_id=str(uuid.uuid4()))
                     person_objs.append(person)
-                    w.execute(q, node_id=node_id, handle_id=person.handle_id)
+                    t.run(q, {'node_id': node_id, 'handle_id': person.handle_id})
                     p += 1
             except Exception as e:
                 raise e
@@ -59,7 +63,8 @@ class Command(BaseCommand):
                 try:
                     Person.objects.bulk_create(person_objs)
                 except DatabaseError as e:
-                    w.connection.rollback()
+                    t.success = False
                     raise e
+            t.success = True
 
         self.stdout.write('Successfully completed! Added %d movies and %d persons.' % (m, p))
