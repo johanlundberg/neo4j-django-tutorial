@@ -87,3 +87,11 @@ class Person(NodeHandle):
 
     def get_absolute_url(self):
         return reverse('person-detail', args=[str(self.id)])
+
+    def _movies(self):
+        movies = []
+        for movie in db.get_movies(self.handle_id):
+            movies.append({'movie': Movie.objects.get(handle_id=movie['handle_id']),
+                           'relationships': movie['relationships']})
+        return movies
+    movies = property(_movies)

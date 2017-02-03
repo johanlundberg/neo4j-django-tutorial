@@ -25,14 +25,6 @@ def delete_node(handle_id, label):
         s.run(q, {'handle_id': handle_id})
 
 
-def get_unique_node(label, key, value):
-    q = 'MATCH (n:%s {%s: {value}}) RETURN n LIMIT 1' % (label, key)
-    with manager.session as s:
-        result = s.run(q, {'value': value})
-        for record in result:
-            return record['n']
-
-
 def wildcard_search(search_string):
     search_string = '(?i).*%s.*' % escape(search_string)
     q = """
@@ -88,3 +80,13 @@ def get_writers(handle_id):
         for record in result:
             yield {'handle_id': record['person.handle_id']}
 
+
+def get_movies(handle_id):
+    q = """
+        MATCH (n:Person {handle_id: {handle_id}})-[r]->(movie)
+        RETURN movie.handle_id, COLLECT(r) as relationships
+        """
+    with manager.session as s:
+        result = s.run(q, {'handle_id': handle_id})
+        for record in result:
+            yield {'handle_id': record['movie.handle_id'], 'relationships': record['relationships']}
