@@ -2,5 +2,35 @@
 {% block title %}{{ block.super }} | Person | {{ object }}{% endblock %}
 
 {% block content %}
-{{ object }}
+    <h1>{{ object.name }}</h1>
+
+    <div class="row">
+        <div class="col-md-6">
+            <dl class="dl-horizontal">
+                {% if object.node.born %}
+                    <dt>Born:</dt><dd>{{ object.node.born }}</dd>
+                {% endif %}
+            </dl>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Movies</h3>
+                </div>
+                <div class="panel-body">
+                    <ul class="list-unstyled">
+                        {% for movie in object.movies|dictsort:"movie.title" %}
+                            <li>
+                                <a href="{{ movie.movie.get_absolute_url }}">{{ movie.movie.title }}</a>
+                            </li>
+                        {% empty %}
+                            <li>No movies yet.</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}

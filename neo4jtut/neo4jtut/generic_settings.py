@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 import os
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
-NEO4J_RESOURCE_URI = 'http://localhost:7474'
+NEO4J_RESOURCE_URI = 'bolt://localhost:7687'
 NEO4J_USERNAME = 'neo4j'
 NEO4J_PASSWORD = 'CHANGE ME'
 
