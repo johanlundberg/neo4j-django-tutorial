@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from contextlib import contextmanager
-from neo4j.v1 import GraphDatabase, basic_auth
+from neo4j.v1 import GraphDatabase, basic_auth, TRUST_DEFAULT
 
 __author__ = 'lundberg'
 
@@ -11,7 +11,8 @@ class Neo4jDBSessionManager:
         self.uri = uri
         self.driver = self._get_db_driver(uri, username, password, encrypted)
 
-    def _get_db_driver(self, uri, username=None, password=None, encrypted=True, max_pool_size=50, trust=0):
+    @staticmethod
+    def _get_db_driver(uri, username=None, password=None, encrypted=True, max_pool_size=50, trust=TRUST_DEFAULT):
         """
         :param uri: Bolt uri
         :type uri: str
@@ -38,8 +39,6 @@ class Neo4jDBSessionManager:
             yield session
         except Exception as e:
             raise e
-        finally:
-            session.close()
     session = property(_session)
 
     @contextmanager
@@ -49,10 +48,8 @@ class Neo4jDBSessionManager:
         try:
             yield transaction
         except Exception as e:
-            transaction.success = False
+            session.rollback_transaction()
             raise e
         else:
-            transaction.success = True
-        finally:
-            session.close()
+            session.commit_transaction()
     transaction = property(_transaction)

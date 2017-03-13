@@ -1,6 +1,5 @@
 # Create your views here.
-from django.template import RequestContext
-from django.shortcuts import render_to_response
+from django.shortcuts import render
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
 from apps.neo4japp.models import Movie, Person
@@ -28,5 +27,4 @@ class PersonListView(ListView):
 
 
 def index(request):
-    return render_to_response('neo4japp/index.html', {},
-                              context_instance=RequestContext(request))
+    return render(request, 'neo4japp/index.html')

@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 from django.core.management.base import BaseCommand
 from django.db import DatabaseError
 import uuid
@@ -46,9 +45,7 @@ class Command(BaseCommand):
                 try:
                     Movie.objects.bulk_create(movie_objs)
                 except DatabaseError as e:
-                    t.success = False
                     raise e
-            t.success = True
 
         with db.manager.transaction as t:
             try:
@@ -63,8 +60,9 @@ class Command(BaseCommand):
                 try:
                     Person.objects.bulk_create(person_objs)
                 except DatabaseError as e:
-                    t.success = False
                     raise e
-            t.success = True
 
         self.stdout.write('Successfully completed! Added %d movies and %d persons.' % (m, p))
+
+
+Command().handle()
