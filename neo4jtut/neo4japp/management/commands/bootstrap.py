@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import
+
 from django.core.management.base import BaseCommand
 from django.db import DatabaseError
 import uuid
-from apps.neo4japp.models import Movie, Person
+from neo4japp.models import Movie, Person
 from neo4jtut import db
 
 __author__ = 'lundberg'

@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 
+from __future__ import absolute_import
+
 from django.conf.urls import url
-from apps.neo4japp.views import MovieListView, MovieDetailView, PersonListView, PersonDetailView, index
+from .views import MovieListView, MovieDetailView, PersonListView, PersonDetailView, index
 
 __author__ = 'lundberg'
 

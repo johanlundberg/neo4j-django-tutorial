@@ -1,7 +1,10 @@
+from __future__ import absolute_import
+
 from django.contrib import admin
-from apps.neo4japp.models import Movie, Person
+from .models import Movie, Person
 
 # Register your models here.
+
 
 class NodeHandleAdmin(admin.ModelAdmin):
     actions = ['delete_object']
