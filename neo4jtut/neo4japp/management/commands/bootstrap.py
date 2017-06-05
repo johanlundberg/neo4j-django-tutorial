@@ -65,6 +65,3 @@ class Command(BaseCommand):
                     raise e
 
         self.stdout.write('Successfully completed! Added %d movies and %d persons.' % (m, p))
-
-
-Command().handle()

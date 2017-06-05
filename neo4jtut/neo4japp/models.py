@@ -12,7 +12,7 @@ class NodeHandle(models.Model):
     class Meta:
         abstract = True
 
-    def __unicode__(self):
+    def __str__(self):
         return 'NodeHandle for node %d' % self.node()['handle_id']
         
     def node(self):
@@ -31,7 +31,7 @@ class NodeHandle(models.Model):
 
 class Movie(NodeHandle):
 
-    def __unicode__(self):
+    def __str__(self):
         return self.title
 
     def _title(self):
@@ -75,7 +75,7 @@ class Movie(NodeHandle):
 
 class Person(NodeHandle):
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     def _name(self):
