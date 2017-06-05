@@ -17,20 +17,21 @@ class Command(BaseCommand):
         with db.manager.session as s:
             s.run('CREATE CONSTRAINT ON (p:Person) ASSERT p.handle_id IS UNIQUE')
             s.run('CREATE CONSTRAINT ON (m:Movie) ASSERT m.handle_id IS UNIQUE')
-        q = """
-            OPTIONAL MATCH (m:Movie) WHERE NOT exists(m.handle_id) WITH collect(id(m)) as movies
-            OPTIONAL MATCH (p:Person) WHERE NOT exists(p.handle_id) WITH movies, collect(id(p)) as persons
-            RETURN movies, persons
-            """
-        try:
-            with db.manager.session as s:
+
+            try:
+                q = """
+                    OPTIONAL MATCH (m:Movie) WHERE NOT exists(m.handle_id) WITH collect(id(m)) as movies
+                    OPTIONAL MATCH (p:Person) WHERE NOT exists(p.handle_id) WITH movies, collect(id(p)) as persons
+                    RETURN movies, persons
+                    """
+
                 record = s.run(q).single()
                 movies = record['movies']
                 persons = record['persons']
-        except IndexError:
-            movies, persons = [], []
+            except IndexError:
+                movies, persons = [], []
 
-        q = 'START n=node({node_id}) SET n.handle_id = {handle_id}'
+        q = 'START n=node($node_id) SET n.handle_id = $handle_id'
         m, p = 0, 0
         movie_objs = []
         person_objs = []
