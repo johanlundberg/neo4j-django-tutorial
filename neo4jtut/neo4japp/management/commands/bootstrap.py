@@ -31,7 +31,7 @@ class Command(BaseCommand):
             except IndexError:
                 movies, persons = [], []
 
-        q = 'START n=node($node_id) SET n.handle_id = $handle_id'
+        q = 'MATCH (n) WHERE ID(n) = $node_id SET n.handle_id = $handle_id'
         m, p = 0, 0
         movie_objs = []
         person_objs = []
